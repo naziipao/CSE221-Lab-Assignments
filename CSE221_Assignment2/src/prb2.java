@@ -1,62 +1,70 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.StringTokenizer;
+public class rough {
 
-public class prb2 {
-    public static void main(String[] args) throws IOException {
-        // Use BufferedReader for fast I/O
+    public static int[] stringBreaker(String s, int num){
+        StringTokenizer st = new StringTokenizer(s);
+        String [] arrStr = new String[num];
+        int [] arrInt = new int[num];
+        int i = 0;
+        while(st.hasMoreTokens()){
+            arrStr[i] = st.nextToken();
+            arrInt[i] = Integer.parseInt(arrStr[i]);
+            i++;
+        }
+        return arrInt;
+    }
+
+    public static String solve(String s1, String s2, String s3){
+        StringBuilder sb = new StringBuilder();
+        int [] arrLine1 = stringBreaker(s1,3);
+        int [] arr1 = stringBreaker(s2,arrLine1[0]);
+        int [] arr2 = stringBreaker(s3,arrLine1[1]);
+        int target = arrLine1[2];
+
+        //Main Operation:
+        int left = 0;
+        int right = arr2.length-1;
+        int minDiff = Integer.MAX_VALUE;
+        int best_left = 0;
+        int best_right = 0;
+        while(left<arr1.length && right>=0){
+            int sum = arr1[left] + arr2[right];
+            int currDiff = sum-target;
+
+            if(minDiff>Math.abs(currDiff)){
+                minDiff = Math.abs(currDiff);
+                best_left = left;
+                best_right = right;
+            }
+
+            if(sum<target){
+                left++;
+            }
+            else if(sum>target){
+                right--;
+            }
+            else{ 
+                sb.append(left+1).append(" ").append(right+1);
+                return sb.toString();
+            }
+        }
+        sb.append(best_left+1).append(" ").append(best_right+1);
+        return sb.toString();
+    }
+    public static void main(String [] args) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        PrintWriter wr = new PrintWriter(System.out);
 
-        // Read N, M, K
-        int n = Integer.parseInt(st.nextToken());
-        int m = Integer.parseInt(st.nextToken());
-        long k = Long.parseLong(st.nextToken()); // Use long for K to prevent overflow issues during diff calc
-
-        // Read Array A
-        int[] A = new int[n];
-        st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < n; i++) {
-            A[i] = Integer.parseInt(st.nextToken());
-        }
-
-        // Read Array B
-        int[] B = new int[m];
-        st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < m; i++) {
-            B[i] = Integer.parseInt(st.nextToken());
-        }
-
-        // --- Two Pointer Logic ---
+            String line1 = br.readLine();
+            String line2 = br.readLine();
+            String line3 = br.readLine();
+            wr.println(solve(line1,line2,line3));
         
-        int l = 0;          // Pointer for A (starts at beginning)
-        int r = m - 1;      // Pointer for B (starts at end)
-        
-        long minDiff = Long.MAX_VALUE;
-        int resL = -1;      // To store best index from A
-        int resR = -1;      // To store best index from B
 
-        while (l < n && r >= 0) {
-            long currentSum = (long)A[l] + B[r];
-            long currentDiff = Math.abs(currentSum - k);
-
-            // 1. Check if this is the best pair so far
-            if (currentDiff < minDiff) {
-                minDiff = currentDiff;
-                resL = l;
-                resR = r;
-            }
-
-            // 2. Move pointers
-            if (currentSum < k) {
-                // We need a larger sum, so move left pointer forward
-                l++;
-            } else {
-                // We need a smaller sum (or equal), so move right pointer backward
-                r--;
-            }
-        }
-
-        // Output results (converting 0-based indices to 1-based)
-        System.out.println((resL + 1) + " " + (resR + 1));
+        wr.flush();
     }
 }
